@@ -1,0 +1,274 @@
+################# HR-SW ################################
+configure terminal
+interface range e0/0-1
+switchport trunk encapsulation dot1q
+switchport mode trunk
+exit
+vtp mode Client
+vtp domain Cisco.com
+vtp password MG@123
+vtp version 2
+do write
+interface range e0/2-3
+switchport mode access
+switchport access vlan 5
+spanning-tree portfast
+spanning-tree bpduguard enable
+exit
+do write
+################# CS-SW ################################
+configure terminal
+interface range e0/0-1
+switchport trunk encapsulation dot1q
+switchport mode trunk
+exit
+vtp mode Client
+vtp domain Cisco.com
+vtp password MG@123
+vtp version 2
+do write
+interface range e0/2-3
+switchport mode access
+switchport access vlan 6
+spanning-tree portfast
+spanning-tree bpduguard enable
+exit
+do write
+################# Finance-SW ################################
+configure terminal
+interface range e0/0-1
+switchport trunk encapsulation dot1q
+switchport mode trunk
+exit
+vtp mode Client
+vtp domain Cisco.com
+vtp password MG@123
+vtp version 2
+do write
+interface range e0/2-3
+switchport mode access
+switchport access vlan 7
+spanning-tree portfast
+spanning-tree bpduguard enable
+exit
+do write
+################# IT-SW ################################
+configure terminal
+interface range e0/0-1
+switchport trunk encapsulation dot1q
+switchport mode trunk
+exit
+vtp mode Client
+vtp domain Cisco.com
+vtp password MG@123
+vtp version 2
+do write
+interface range e0/2-3
+switchport mode access
+switchport access vlan 8
+spanning-tree portfast
+spanning-tree bpduguard enable
+exit
+do write
+################# HQ-Controller ################################
+configure terminal
+interface range e1/0, e1/1, e1/2, e1/3
+switchport trunk encapsulation dot1q
+
+switchport mode trunk
+exit
+interface range e0/1-3
+channel-group 5 mode active
+exit
+interface port-channel 5
+switchport trunk encapsulation dot1q
+
+switchport mode trunk
+exit
+interface e0/0
+no switchport
+no shutdown
+ip address 172.168.0.1 255.255.255.252
+exit
+vtp mode server
+vtp domain Cisco.com
+vtp password MG@123
+vtp version 2
+do write
+vlan 5
+name ¨Human Resources¨
+exit
+vlan 6
+name ¨Customer Service¨
+exit
+vlan 7
+name ¨Finance¨
+exit
+vlan 8
+name ¨Information Technology¨
+exit
+do write
+interface vlan 5
+no shutdown
+ip address 156.172.25.1 255.255.255.192
+ip helper-address 172.168.0.2
+standby 5 priority 90
+standby 5 ip 156.172.25.2
+standby 5 preempt
+exit
+interface vlan 6
+no shutdown
+ip address 156.172.25.65 255.255.255.192
+ip helper-address 172.168.0.2
+standby 5 priority 90
+standby 5 ip 156.172.25.66
+standby 5 preempt
+exit
+interface vlan 7
+no shutdown
+ip address 156.172.25.129 255.255.255.192
+ip helper-address 172.168.0.2
+standby 5 priority 90
+standby 5 ip 156.172.25.130
+standby 5 preempt
+exit
+interface vlan 8
+no shutdown
+ip address 156.172.25.193 255.255.255.192
+ip helper-address 172.168.0.2
+standby 5 priority 90
+standby 5 ip 156.172.25.194
+standby 5 preempt
+exit
+do write
+ip routing
+router bgp 3580
+bgp router-id 1.1.2.1
+neighbor 172.168.0.2 remote-as  3580
+network 172.168.0.0 mask 255.255.255.252
+network 156.172.25.0 mask 255.255.255.192
+network 156.172.25.64 mask 255.255.255.192
+network 156.172.25.128 mask 255.255.255.192
+network 156.172.25.192 mask 255.255.255.192
+exit
+do write
+################# HQ-Bckup ################################
+configure terminal
+interface range e1/0, e1/1, e1/2, e1/3
+switchport trunk encapsulation dot1q
+switchport mode trunk
+exit
+interface range e0/1-3
+channel-group 5 mode active
+exit
+interface port-channel 5
+switchport trunk encapsulation dot1q
+switchport mode trunk
+exit
+interface e0/0
+no switchport
+no shutdown
+ip address 172.168.0.5 255.255.255.252
+exit
+vtp mode Client
+vtp domain Cisco.com
+vtp password MG@123
+vtp version 2
+do write
+interface vlan 5
+no shutdown
+ip address 156.172.25.1 255.255.255.192
+ip helper-address 172.168.0.6
+standby 5 priority 80
+standby 5 ip 156.172.25.2
+standby 5 preempt
+exit
+interface vlan 6
+no shutdown
+ip address 156.172.25.65 255.255.255.192
+ip helper-address 172.168.0.6
+standby 5 priority 80
+standby 5 ip 156.172.25.66
+standby 5 preempt
+exit
+interface vlan 7
+no shutdown
+ip address 156.172.25.129 255.255.255.192
+ip helper-address 172.168.0.6
+standby 5 priority 80
+standby 5 ip 156.172.25.130
+standby 5 preempt
+exit
+interface vlan 8
+no shutdown
+ip address 156.172.25.193 255.255.255.192
+ip helper-address 172.168.0.6
+standby 5 priority 80
+standby 5 ip 156.172.25.194
+standby 5 preempt
+exit
+do write
+ip routing
+router bgp 3580
+bgp router-id 1.1.2.2
+neighbor 172.168.0.6 remote-as  3580
+network 172.168.0.4 mask 255.255.255.252
+network 156.172.25.0 mask 255.255.255.192
+network 156.172.25.64 mask 255.255.255.192
+network 156.172.25.128 mask 255.255.255.192
+network 156.172.25.192 mask 255.255.255.192
+exit
+do write
+################# Vodafone-ISP ################################
+configure terminal
+interface e0/1
+no shutdown
+ip address 172.168.0.2 255.255.255.252
+exit
+interface e0/0
+no shutdown
+ip address 172.168.0.6 255.255.255.252
+exit
+interface s2/0
+no shutdown
+ip address 197.200.100.1 255.255.255.252
+exit
+router bgp 3580
+bgp router-id 1.1.1.1
+neighbor 172.168.0.1 remote-as 3580
+neighbor 172.168.0.5 remote-as 3580
+neighbor 192.168.1.18 remote-as 3580
+neighbor 197.200.100.2 remote-as 3581
+network 172.168.0.0 mask 255.255.255.252
+network 172.168.0.4 mask 255.255.255.252
+network 192.168.1.0 mask 255.255.255.0
+network 197.200.100.0 mask 255.255.255.252
+exit
+do write
+service dhcp
+ip dhcp pool HR
+network 156.172.25.0 255.255.255.192
+default-router 156.172.25.1
+dns-server 5.5.5.5
+domain-name Cisco.Com
+exit
+ip dhcp pool CS
+network 156.172.25.64 255.255.255.192
+default-router 156.172.25.65
+dns-server 5.5.5.5
+domain-name Cisco.Com
+exit
+ip dhcp pool Finance
+network 156.172.25.128 255.255.255.192
+default-router 156.172.25.129
+dns-server 5.5.5.5
+domain-name Cisco.Com
+exit
+ip dhcp pool IT
+network 156.172.25.192 255.255.255.192
+default-router 156.172.25.193
+dns-server 5.5.5.5
+domain-name Cisco.Com
+exit
+do write
+

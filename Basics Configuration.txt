@@ -1,0 +1,29 @@
+ enable
+ configure terminal
+ hostname BR-Backup
+ enable password cisco
+ enable secret MG@123
+ banner motd $
+***********************************************************************
+* WARNING: This system is for authorized use only.                    *
+* Unauthorized access is prohibited and will be prosecuted under      *
+* applicable laws. All activities on this system are logged.          *
+* If you are not authorized to access this device, disconnect now.    *
+***********************************************************************
+$
+service password-encryption
+line console 0
+password MG@123
+login
+logging synchronous
+exec-timeout 10 0
+exit
+ip domain-name MG.com
+username Admin password MG@123
+line vty 0 4
+login local
+logging synchronous
+exec-timeout 10 0
+transport input all
+exit
+do write

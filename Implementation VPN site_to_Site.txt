@@ -1,0 +1,66 @@
+################ Vodafone-ISP #################################
+configure terminal
+interface tunnel 0
+ip address 197.200.100.5 255.255.255.252
+tunnel source 197.200.100.1
+tunnel destination 197.200.100.2
+exit
+! ========== BGP CONFIGURATION ==========
+router bgp 3580
+neighbor 197.200.100.6 remote-as 3581
+network 197.200.100.4 mask 255.255.255.252
+exit
+! ========== ISAKMP CONFIGURATION ==========
+crypto isakmp policy 10
+encryption aes
+hash sha256
+authentication pre-share
+group 2
+lifetime 86400
+exit
+crypto isakmp key MYSECRETKEY address 197.200.100.2
+! ========== CRYPTO ACL ==========
+access-list 110 permit gre host 197.200.100.1 host 197.200.100.2
+! ========== TRANSFORM SET ==========
+crypto ipsec transform-set GRE-SET esp-aes esp-sha-hmac
+crypto map VPN-MAP 10 ipsec-isakmp
+set peer 197.200.100.2
+set transform-set GRE-SET
+match address 110
+exit
+interface s2/0
+crypto map VPN-MAP
+exit
+do write
+################ Branch-GW #################################
+configure terminal
+interface tunnel 0
+ip address 197.200.100.6 255.255.255.252
+tunnel source 197.200.100.2
+tunnel destination 197.200.100.1
+exit
+router bgp 3581
+neighbor 197.200.100.5 remote-as 3580
+network 197.200.100.4 mask 255.255.255.252
+exit
+crypto isakmp policy 10
+encryption aes
+hash sha256
+authentication pre-share
+group 2
+lifetime 86400
+exit
+crypto isakmp key MYSECRETKEY address 197.200.100.1
+access-list 110 permit gre host 197.200.100.2 host 197.200.100.1
+crypto ipsec transform-set GRE-SET esp-aes esp-sha-hmac
+crypto map VPN-MAP 10 ipsec-isakmp
+set peer 197.200.100.1
+set transform-set GRE-SET
+match address 110
+exit
+interface s2/0
+crypto map VPN-MAP
+exit
+do write
+
+
